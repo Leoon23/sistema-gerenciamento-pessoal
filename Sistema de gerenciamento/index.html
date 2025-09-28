@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento Pessoal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-title i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        /* Seção de Tarefas */
+        .task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* Lista de Tarefas */
+        .task-list {
+            min-height: 300px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            border-left-color: #27ae60;
+        }
+
+        .task-item.completed .task-content h4 {
+            text-decoration: line-through;
+        }
+
+        .task-content h4 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .task-category {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Seção Financeira */
+        .expense-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .expense-list {
+            min-height: 200px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .expense-info h4 {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .expense-info small {
+            color: #666;
+        }
+
+        .expense-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        /* Filtros */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 8px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* Estados vazios */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Sistema de Gerenciamento Pessoal</h1>
+            <p>Organize suas tarefas e controle seus gastos em um só lugar</p>
+        </div>
+
+        <!-- Dashboard Principal -->
+        <div class="dashboard">
+            <!-- Seção de Tarefas -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-tasks"></i>
+                        <span>Gerenciador de Tarefas</span>
+                    </div>
+                </div>
+
+                <!-- Formulário de Tarefas -->
+                <form class="task-form" id="taskForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskTitle">Título da Tarefa</label>
+                            <input type="text" id="taskTitle" placeholder="Digite o título da tarefa..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory">Categoria</label>
+                            <select id="taskCategory" required>
+                                <option value="">Selecione...</option>
+                                <option value="pessoal">Pessoal</option>
+                                <option value="trabalho">Trabalho</option>
+                                <option value="estudos">Estudos</option>
+                                <option value="saude">Saúde</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adicionar Tarefa
+                    </button>
+                </form>
+
+                <!-- Filtros de Tarefas -->
+                <div class="filters">
+                    <select id="taskFilter">
+                        <option value="all">Todas as tarefas</option>
+                        <option value="pending">Pendentes</option>
+                        <option value="completed">Concluídas</option>
+                    </select>
+                    <select id="categoryFilter">
+                        <option value="all">Todas as categorias</option>
+                        <option value="pessoal">Pessoal</option>
+                        <option value="trabalho">Trabalho</option>
+                        <option value="estudos">Estudos</option>
+                        <option value="saude">Saúde</option>
+                    </select>
+                </div>
+
+                <!-- Lista de Tarefas -->
+                <div class="task-list" id="taskList">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Nenhuma tarefa cadastrada ainda.</p>
+                        <small>Adicione sua primeira tarefa acima!</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Financeira -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-wallet"></i>
+                        <span>Controle Financeiro</span>
+                    </div>
+                </div>
+
+                <!-- Resumo Financeiro -->
+                <div class="summary">
+                    <div class="summary-item">
+                        <div class="summary-value" id="totalExpenses">R$ 0,00</div>
+                        <div class="summary-label">Total de Gastos</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="expenseCount">0</div>
+                        <div class="summary-label">Registros</div>
+                    </div>
+                </div>
+
+                <!-- Formulário de Gastos -->
+                <form class="expense-form" id="expenseForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDescription">Descrição</label>
+                            <input type="text" id="expenseDescription" placeholder="Ex: Almoço, Transporte..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseValue">Valor</label>
+                            <input type="number" id="expenseValue" placeholder="0,00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Categoria</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Selecione...</option>
+                            <option value="alimentacao">Alimentação</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="saude">Saúde</option>
+                            <option value="lazer">Lazer</option>
+                            <option value="estudos">Estudos</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adicionar Gasto
+                    </button>
+                </form>
+
+                <!-- Lista de Gastos -->
+                <div class="expense-list" id="expenseList">
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>Nenhum gasto registrado ainda.</p>
+                        <small>Adicione seu primeiro gasto acima!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // SISTEMA DE GERENCIAMENTO PESSOAL
+        // ========================================
+
+        // 1. ESTRUTURAS DE DADOS (Arrays para armazenar informações)
+        let tasks = []; // Array para armazenar todas as tarefas
+        let expenses = []; // Array para armazenar todos os gastos
+
+        // 2. SELETORES DOS ELEMENTOS HTML
+        const taskForm = document.getElementById('taskForm');
+        const taskList = document.getElementById('taskList');
+        const taskFilter = document.getElementById('taskFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        
+        const expenseForm = document.getElementById('expenseForm');
+        const expenseList = document.getElementById('expenseList');
+        const totalExpenses = document.getElementById('totalExpenses');
+        const expenseCount = document.getElementById('expenseCount');
+
+        // 3. FUNÇÕES PARA GERENCIAR DADOS NO LOCALSTORAGE
+        function saveData() {
+            // Salva os dados no navegador (persistência local)
+            localStorage.setItem('personalTasks', JSON.stringify(tasks));
+            localStorage.setItem('personalExpenses', JSON.stringify(expenses));
+            console.log('Dados salvos no localStorage!');
+        }
+
+        function loadData() {
+            // Carrega os dados salvos quando a página é aberta
+            const savedTasks = localStorage.getItem('personalTasks');
+            const savedExpenses = localStorage.getItem('personalExpenses');
+            
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                console.log('Tarefas carregadas:', tasks.length);
+            }
+            
+            if (savedExpenses) {
+                expenses = JSON.parse(savedExpenses);
+                console.log('Gastos carregados:', expenses.length);
+            }
+        }
+
+        // 4. FUNÇÕES PARA GERENCIAR TAREFAS
+        function addTask(title, category) {
+            // Cria um novo objeto tarefa
+            const newTask = {
+                id: Date.now(), // ID único usando timestamp
+                title: title,
+                category: category,
+                completed: false,
+                createdAt: new Date().toLocaleString('pt-BR')
+            };
+            
+            // Adiciona ao array de tarefas
+            tasks.push(newTask);
+            
+            // Salva no localStorage e atualiza a tela
+            saveData();
+            renderTasks();
+            
+            console.log('Nova tarefa adicionada:', newTask);
+        }
+
+        function toggleTask(id) {
+            // Encontra a tarefa pelo ID e inverte o status
+            const task = tasks.find(task => task.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveData();
+                renderTasks();
+                console.log('Tarefa alterada:', task);
+            }
+        }
+
+        function deleteTask(id) {
+            // Remove a tarefa do array
+            tasks = tasks.filter(task => task.id !== id);
+            saveData();
+            renderTasks();
+            console.log('Tarefa removida, ID:', id);
+        }
+
+        function renderTasks() {
+            // Obtém os filtros atuais
+            const statusFilter = taskFilter.value;
+            const catFilter = categoryFilter.value;
+            
+            // Filtra as tarefas baseado nos filtros selecionados
+            let filteredTasks = tasks.filter(task => {
+                const matchesStatus = statusFilter === 'all' || 
+                                    (statusFilter === 'completed' && task.completed) ||
+                                    (statusFilter === 'pending' && !task.completed);
+                                    
+                const matchesCategory = catFilter === 'all' || task.category === catFilter;
+                
+                return matchesStatus && matchesCategory;
+            });
+
+            // Limpa a lista atual
+            taskList.innerHTML = '';
+
+            // Se não há tarefas, mostra estado vazio
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Nenhuma tarefa encontrada.</p>
+                        <small>Adicione uma nova tarefa ou altere os filtros!</small>
+                    </div>
+                `;
+                return;
+            }
+
+            // Renderiza cada tarefa
+            filteredTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                
+                taskElement.innerHTML = `
+                    <div class="task-content">
+                        <h4>${task.title}</h4>
+                        <div class="task-meta">
+                            <span class="task-category">${getCategoryName(task.category)}</span>
+                            <span><i class="fas fa-clock"></i> ${task.createdAt}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-small btn-success" onclick="toggleTask(${task.id})" title="${task.completed ? 'Marcar como pendente' : 'Marcar como concluída'}">
+                            <i class="fas ${task.completed ? 'fa-undo' : 'fa-check'}"></i>
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteTask(${task.id})" title="Excluir tarefa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                taskList.appendChild(taskElement);
+            });
+        }
+
+        // 5. FUNÇÕES PARA GERENCIAR GASTOS
+        function addExpense(description, value, category) {
+            const newExpense = {
+                id: Date.now(),
+                description: description,
+                value: parseFloat(value),
+                category: category,
+                createdAt: new Date().toLocaleString('pt-BR')
+            };
+            
+            expenses.push(newExpense);
+            saveData();
+            renderExpenses();
+            updateFinancialSummary();
+            
+            console.log('Novo gasto adicionado:', newExpense);
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(expense => expense.id !== id);
+            saveData();
+            renderExpenses();
+            updateFinancialSummary();
+            console.log('Gasto removido, ID:', id);
+        }
+
+        function renderExpenses() {
+            expenseList.innerHTML = '';
+
+            if (expenses.length === 0) {
+                expenseList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>Nenhum gasto registrado ainda.</p>
+                        <small>Adicione seu primeiro gasto acima!</small>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordena gastos por data (mais recentes primeiro)
+            const sortedExpenses = expenses.sort((a, b) => b.id - a.id);
+
+            sortedExpenses.forEach(expense => {
+                const expenseElement = document.createElement('div');
+                expenseElement.className = 'expense-item';
+                
+                expenseElement.innerHTML = `
+                    <div class="expense-info">
+                        <h4>${expense.description}</h4>
+                        <small><i class="fas fa-tag"></i> ${getCategoryName(expense.category)} • ${expense.createdAt}</small>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="expense-value">R$ ${expense.value.toFixed(2).replace('.', ',')}</span>
+                        <button class="btn btn-small btn-danger" onclick="deleteExpense(${expense.id})" title="Excluir gasto">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                expenseList.appendChild(expenseElement);
+            });
+        }
+
+        function updateFinancialSummary() {
+            // Calcula o total de gastos
+            const total = expenses.reduce((sum, expense) => sum + expense.value, 0);
+            
+            // Atualiza os elementos na tela
+            totalExpenses.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            expenseCount.textContent = expenses.length;
+        }
+
+        // 6. FUNÇÕES AUXILIARES
+        function getCategoryName(category) {
+            const categories = {
+                // Tarefas
+                'pessoal': 'Pessoal',
+                'trabalho': 'Trabalho', 
+                'estudos': 'Estudos',
+                'saude': 'Saúde',
+                // Gastos
+                'alimentacao': 'Alimentação',
+                'transporte': 'Transporte',
+                'lazer': 'Lazer',
+                'outros': 'Outros'
+            };
+            
+            return categories[category] || category;
+        }
+
+        // 7. EVENT LISTENERS (Escutadores de Eventos)
+        
+        // Formulário de Tarefas
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Impede o formulário de recarregar a página
+            
+            // Obtém os valores dos campos
+            const title = document.getElementById('taskTitle').value.trim();
+            const category = document.getElementById('taskCategory').value;
+            
+            // Validação básica
+            if (!title || !category) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+            
+            // Adiciona a tarefa
+            addTask(title, category);
+            
+            // Limpa o formulário
+            taskForm.reset();
+        });
+
+        // Formulário de Gastos  
+        expenseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const description = document.getElementById('expenseDescription').value.trim();
+            const value = document.getElementById('expenseValue').value;
+            const category = document.getElementById('expenseCategory').value;
+            
+            if (!description || !value || !category || value <= 0) {
+                alert('Por favor, preencha todos os campos corretamente!');
+                return;
+            }
+            
+            addExpense(description, value, category);
+            expenseForm.reset();
+        });
+
+        // Filtros de Tarefas
+        taskFilter.addEventListener('change', renderTasks);
+        categoryFilter.addEventListener('change', renderTasks);
+
+        // 8. INICIALIZAÇÃO DA APLICAÇÃO
+        function initApp() {
+            console.log('🚀 Inicializando Sistema de Gerenciamento Pessoal...');
+            
+            // Carrega dados salvos
+            loadData();
+            
+            // Renderiza as telas
+            renderTasks();
+            renderExpenses();
+            updateFinancialSummary();
+            
+            console.log('✅ Sistema inicializado com sucesso!');
+            console.log(`📋 ${tasks.length} tarefas carregadas`);
+            console.log(`💰 ${expenses.length} gastos carregados`);
+        }
+
+        // Executa quando a página termina de carregar
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        console.log('Sistema de Gerenciamento Pessoal carregado! 🎉');
+    </script>
+</body>
+</html>
